@@ -15,7 +15,7 @@ enum StatusFilter {
 
 #[component]
 pub fn Home() -> Element {
-    let tickets = use_context::<Signal<Vec<Ticket>>>();
+    let mut tickets = use_context::<Signal<Vec<Ticket>>>();
     let mut selected_filter = use_signal(|| StatusFilter::All);
 
     let filtered_tickets: Vec<Ticket> = tickets
@@ -36,7 +36,7 @@ pub fn Home() -> Element {
 
             header {
                 class: "header",
-                h1 { "Simple Ticket System" }
+                h1 { "Sara" }
             }
 
             section {
@@ -89,7 +89,24 @@ pub fn Home() -> Element {
                             p { "{ticket.description}" }
                             div {
                                 class: "meta",
-                                span { "Status: {format_status(&ticket.status)}" }
+                                span {
+                                    "Status: "
+                                    select {
+                                        value: "{format_status(&ticket.status)}",
+                                        onchange: {
+                                            let ticket_id = ticket.id;
+                                            move |event| {
+                                                let next_status = parse_status(&event.value());
+                                                if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == ticket_id) {
+                                                    current_ticket.status = next_status;
+                                                }
+                                            }
+                                        },
+                                        option { value: "Todo", "Todo" }
+                                        option { value: "In Progress", "In Progress" }
+                                        option { value: "Done", "Done" }
+                                    }
+                                }
                                 span { "Priority: {format_priority(&ticket.priority)}" }
                             }
                         }
@@ -105,6 +122,15 @@ fn format_status(status: &TicketStatus) -> &'static str {
         TicketStatus::Todo => "Todo",
         TicketStatus::InProgress => "In Progress",
         TicketStatus::Done => "Done",
+    }
+}
+
+fn parse_status(value: &str) -> TicketStatus {
+    match value {
+        "Todo" => TicketStatus::Todo,
+        "In Progress" => TicketStatus::InProgress,
+        "Done" => TicketStatus::Done,
+        _ => TicketStatus::Todo,
     }
 }
 
