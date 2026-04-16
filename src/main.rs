@@ -1,9 +1,12 @@
 use dioxus::prelude::*;
 
+mod create_ticket;
 mod home;
 mod models;
 
+use create_ticket::CreateTicket;
 use home::Home;
+use models::mock_tickets;
 
 fn main() {
     dioxus::launch(App);
@@ -13,10 +16,15 @@ fn main() {
 enum Route {
     #[route("/")]
     Home {},
+    #[route("/create")]
+    CreateTicket {},
 }
 
 #[component]
 fn App() -> Element {
+    let tickets = use_signal(mock_tickets);
+    use_context_provider(|| tickets);
+
     rsx! {
         style {
             {r#"
@@ -51,6 +59,35 @@ fn App() -> Element {
                     color: #666;
                 }
 
+                .actions {
+                    margin-bottom: 12px;
+                }
+
+                .button,
+                .link-button {
+                    display: inline-block;
+                    padding: 8px 12px;
+                    border: 1px solid #d0d0d6;
+                    border-radius: 6px;
+                    background: #fff;
+                    color: #222;
+                    text-decoration: none;
+                    cursor: pointer;
+                    font-size: 14px;
+                }
+
+                .button:hover,
+                .link-button:hover {
+                    background: #f0f0f3;
+                }
+
+                .filter-row {
+                    display: flex;
+                    gap: 8px;
+                    margin-bottom: 12px;
+                    flex-wrap: wrap;
+                }
+
                 .section-title {
                     margin: 0 0 12px;
                     font-size: 20px;
@@ -83,6 +120,45 @@ fn App() -> Element {
                     color: #555;
                     display: flex;
                     gap: 14px;
+                }
+
+                .form-card {
+                    background: #fff;
+                    border: 1px solid #e3e3e8;
+                    border-radius: 8px;
+                    padding: 14px;
+                }
+
+                .form-group {
+                    margin-bottom: 12px;
+                }
+
+                .form-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    font-size: 14px;
+                }
+
+                .input,
+                .textarea,
+                .select {
+                    width: 100%;
+                    padding: 8px;
+                    border: 1px solid #d0d0d6;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-family: inherit;
+                    background: #fff;
+                }
+
+                .textarea {
+                    min-height: 90px;
+                    resize: vertical;
+                }
+
+                .form-actions {
+                    display: flex;
+                    gap: 8px;
                 }
             "#}
         }

@@ -1,11 +1,34 @@
 use dioxus::prelude::*;
 
-use crate::models::{mock_tickets, TicketPriority, TicketStatus};
+use crate::{
+    models::{Ticket, TicketPriority, TicketStatus},
+    Route,
+};
+
+#[derive(Clone, Copy, PartialEq)]
+enum StatusFilter {
+    All,
+    Todo,
+    InProgress,
+    Done,
+}
 
 #[component]
 pub fn Home() -> Element {
-    // Day 1: ticket data is hardcoded in memory.
-    let tickets = mock_tickets();
+    let tickets = use_context::<Signal<Vec<Ticket>>>();
+    let mut selected_filter = use_signal(|| StatusFilter::All);
+
+    let filtered_tickets: Vec<Ticket> = tickets
+        .read()
+        .iter()
+        .filter(|ticket| match *selected_filter.read() {
+            StatusFilter::All => true,
+            StatusFilter::Todo => ticket.status == TicketStatus::Todo,
+            StatusFilter::InProgress => ticket.status == TicketStatus::InProgress,
+            StatusFilter::Done => ticket.status == TicketStatus::Done,
+        })
+        .cloned()
+        .collect();
 
     rsx! {
         main {
@@ -14,7 +37,6 @@ pub fn Home() -> Element {
             header {
                 class: "header",
                 h1 { "Simple Ticket System" }
-                p { "Day 1 MVP" }
             }
 
             section {
@@ -24,9 +46,42 @@ pub fn Home() -> Element {
                 }
 
                 div {
+                    class: "actions",
+                    Link {
+                        class: "link-button",
+                        to: Route::CreateTicket {},
+                        "Create Ticket"
+                    }
+                }
+
+                div {
+                    class: "filter-row",
+                    button {
+                        class: "button",
+                        onclick: move |_| selected_filter.set(StatusFilter::All),
+                        "All"
+                    }
+                    button {
+                        class: "button",
+                        onclick: move |_| selected_filter.set(StatusFilter::Todo),
+                        "Todo"
+                    }
+                    button {
+                        class: "button",
+                        onclick: move |_| selected_filter.set(StatusFilter::InProgress),
+                        "In Progress"
+                    }
+                    button {
+                        class: "button",
+                        onclick: move |_| selected_filter.set(StatusFilter::Done),
+                        "Done"
+                    }
+                }
+
+                div {
                     class: "ticket-list",
 
-                    for ticket in tickets {
+                    for ticket in filtered_tickets {
                         article {
                             key: "{ticket.id}",
                             class: "ticket-card",

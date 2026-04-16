@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Ticket {
     pub id: u32,
     pub title: String,
@@ -7,14 +7,14 @@ pub struct Ticket {
     pub priority: TicketPriority,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum TicketStatus {
     Todo,
     InProgress,
     Done,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum TicketPriority {
     Low,
     Medium,
@@ -25,37 +25,36 @@ pub fn mock_tickets() -> Vec<Ticket> {
     vec![
         Ticket {
             id: 1,
-            title: "Set up project".to_string(),
-            description: "Create a minimal Dioxus project structure.".to_string(),
+            title: "test 1".to_string(),
+            description: "hjvbjhvjhvjc".to_string(),
             status: TicketStatus::Done,
             priority: TicketPriority::High,
         },
         Ticket {
             id: 2,
-            title: "Create homepage layout".to_string(),
-            description: "Add a small header and main tickets section.".to_string(),
+            title: "test 2".to_string(),
+            description: "jkhköjiohlh".to_string(),
             status: TicketStatus::InProgress,
             priority: TicketPriority::High,
         },
         Ticket {
             id: 3,
-            title: "Add ticket cards".to_string(),
-            description: "Display each ticket title, description, status, and priority."
-                .to_string(),
+            title: "something 3".to_string(),
+            description: "hjjhgfhghjfg".to_string(),
             status: TicketStatus::Todo,
             priority: TicketPriority::Medium,
         },
         Ticket {
             id: 4,
-            title: "Style the page".to_string(),
-            description: "Keep styling clean and minimal for Day 1.".to_string(),
+            title: "ticket 4".to_string(),
+            description: "jkjhlk".to_string(),
             status: TicketStatus::Todo,
             priority: TicketPriority::Low,
         },
         Ticket {
             id: 5,
-            title: "Prepare for Day 2".to_string(),
-            description: "Leave the code simple so it is easy to extend later.".to_string(),
+            title: "problem 5".to_string(),
+            description: "jhhcfgxfhx".to_string(),
             status: TicketStatus::Todo,
             priority: TicketPriority::Medium,
         },
