@@ -57,22 +57,22 @@ pub fn Home() -> Element {
                 div {
                     class: "filter-row",
                     button {
-                        class: "button",
+                        class: if *selected_filter.read() == StatusFilter::All { "button active" } else { "button" },
                         onclick: move |_| selected_filter.set(StatusFilter::All),
                         "All"
                     }
                     button {
-                        class: "button",
+                        class: if *selected_filter.read() == StatusFilter::Todo { "button active" } else { "button" },
                         onclick: move |_| selected_filter.set(StatusFilter::Todo),
                         "Todo"
                     }
                     button {
-                        class: "button",
+                        class: if *selected_filter.read() == StatusFilter::InProgress { "button active" } else { "button" },
                         onclick: move |_| selected_filter.set(StatusFilter::InProgress),
                         "In Progress"
                     }
                     button {
-                        class: "button",
+                        class: if *selected_filter.read() == StatusFilter::Done { "button active" } else { "button" },
                         onclick: move |_| selected_filter.set(StatusFilter::Done),
                         "Done"
                     }

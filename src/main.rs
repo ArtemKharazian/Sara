@@ -35,7 +35,7 @@ fn App() -> Element {
                 body {
                     margin: 0;
                     font-family: Arial, sans-serif;
-                    background: #f7f7f8;
+                    background: #c4dfe6;
                     color: #222;
                 }
 
@@ -52,11 +52,12 @@ fn App() -> Element {
                 .header h1 {
                     margin: 0;
                     font-size: 28px;
+                    color: #003B46;
                 }
 
                 .header p {
                     margin: 6px 0 0;
-                    color: #666;
+                    color: #003B46;
                 }
 
                 .actions {
@@ -70,15 +71,21 @@ fn App() -> Element {
                     border: 1px solid #d0d0d6;
                     border-radius: 6px;
                     background: #fff;
-                    color: #222;
+                    color: #003B46;
                     text-decoration: none;
                     cursor: pointer;
                     font-size: 14px;
                 }
+                
+                .button.active {
+                    background: #66A5AD;
+                    color: #ffffff;
+                }
 
                 .button:hover,
                 .link-button:hover {
-                    background: #f0f0f3;
+                    background: #66A5AD;
+                    color: #ffffff;
                 }
 
                 .filter-row {
@@ -91,6 +98,7 @@ fn App() -> Element {
                 .section-title {
                     margin: 0 0 12px;
                     font-size: 20px;
+                    color: #003B46;
                 }
 
                 .ticket-list {
@@ -108,6 +116,7 @@ fn App() -> Element {
                 .ticket-card h3 {
                     margin: 0 0 8px;
                     font-size: 18px;
+                    color: #003B46;
                 }
 
                 .ticket-card p {

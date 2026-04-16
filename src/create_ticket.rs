@@ -20,7 +20,7 @@ pub fn CreateTicket() -> Element {
             header {
                 class: "header",
                 h1 { "Create Ticket" }
-                p { "Add a new ticket for Day 2." }
+                p { "Add a new ticket to the system" }
             }
 
             section {
