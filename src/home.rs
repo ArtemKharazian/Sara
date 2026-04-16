@@ -82,32 +82,37 @@ pub fn Home() -> Element {
                     class: "ticket-list",
 
                     for ticket in filtered_tickets {
-                        article {
+                        Link {
                             key: "{ticket.id}",
-                            class: "ticket-card",
-                            h3 { "{ticket.title}" }
-                            p { "{ticket.description}" }
-                            div {
-                                class: "meta",
-                                span {
-                                    "Status: "
-                                    select {
-                                        value: "{format_status(&ticket.status)}",
-                                        onchange: {
-                                            let ticket_id = ticket.id;
-                                            move |event| {
-                                                let next_status = parse_status(&event.value());
-                                                if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == ticket_id) {
-                                                    current_ticket.status = next_status;
+                            class: "ticket-link",
+                            to: Route::TicketDetails { id: ticket.id },
+                            article {
+                                class: "ticket-card",
+                                h3 { "{ticket.title}" }
+                                p { "{ticket.description}" }
+                                div {
+                                    class: "meta",
+                                    span {
+                                        "Status: "
+                                        select {
+                                            value: "{format_status(&ticket.status)}",
+                                            onclick: move |event| event.stop_propagation(),
+                                            onchange: {
+                                                let ticket_id = ticket.id;
+                                                move |event| {
+                                                    let next_status = parse_status(&event.value());
+                                                    if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == ticket_id) {
+                                                        current_ticket.status = next_status;
+                                                    }
                                                 }
-                                            }
-                                        },
-                                        option { value: "Todo", "Todo" }
-                                        option { value: "In Progress", "In Progress" }
-                                        option { value: "Done", "Done" }
+                                            },
+                                            option { value: "Todo", "Todo" }
+                                            option { value: "In Progress", "In Progress" }
+                                            option { value: "Done", "Done" }
+                                        }
                                     }
+                                    span { "Priority: {format_priority(&ticket.priority)}" }
                                 }
-                                span { "Priority: {format_priority(&ticket.priority)}" }
                             }
                         }
                     }

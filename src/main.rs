@@ -3,10 +3,12 @@ use dioxus::prelude::*;
 mod create_ticket;
 mod home;
 mod models;
+mod ticket_details;
 
 use create_ticket::CreateTicket;
 use home::Home;
 use models::mock_tickets;
+use ticket_details::TicketDetails;
 
 fn main() {
     dioxus::launch(App);
@@ -18,6 +20,8 @@ enum Route {
     Home {},
     #[route("/create")]
     CreateTicket {},
+    #[route("/ticket/:id")]
+    TicketDetails { id: u32 },
 }
 
 #[component]
@@ -111,6 +115,11 @@ fn App() -> Element {
                     border: 1px solid #e3e3e8;
                     border-radius: 8px;
                     padding: 12px;
+                }
+
+                .ticket-link {
+                    text-decoration: none;
+                    color: inherit;
                 }
 
                 .ticket-card h3 {
