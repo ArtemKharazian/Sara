@@ -118,13 +118,13 @@ fn App() -> Element {
                 }
 
                 .ticket-status-strip {
-                    height: 4px;
+                    height: 10px;
                     border-radius: 4px;
                     margin: -12px -12px 10px;
                 }
 
                 .status-todo {
-                    background: #e74c3c;
+                    background:rgb(252, 138, 125);
                 }
 
                 .status-in-progress {

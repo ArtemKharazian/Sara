@@ -115,6 +115,18 @@ pub fn Home() -> Element {
                                         }
                                     }
                                     span { "Priority: {format_priority(&ticket.priority)}" }
+                                    button {
+                                        class: "button",
+                                        onclick: {
+                                            let ticket_id = ticket.id;
+                                            move |event| {
+                                                event.stop_propagation();
+                                                event.prevent_default();
+                                                tickets.write().retain(|item| item.id != ticket_id);
+                                            }
+                                        },
+                                        "Delete"
+                                    }
                                 }
                             }
                         }
