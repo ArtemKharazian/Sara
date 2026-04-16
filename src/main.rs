@@ -117,6 +117,24 @@ fn App() -> Element {
                     padding: 12px;
                 }
 
+                .ticket-status-strip {
+                    height: 4px;
+                    border-radius: 4px;
+                    margin: -12px -12px 10px;
+                }
+
+                .status-todo {
+                    background: #e74c3c;
+                }
+
+                .status-in-progress {
+                    background: #3498db;
+                }
+
+                .status-done {
+                    background: #2ecc71;
+                }
+
                 .ticket-link {
                     text-decoration: none;
                     color: inherit;

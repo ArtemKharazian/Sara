@@ -9,7 +9,7 @@ use crate::{
 pub fn TicketDetails(id: u32) -> Element {
     let mut tickets = use_context::<Signal<Vec<Ticket>>>();
 
-    let maybe_ticket = tickets.read().iter().find(|ticket| ticket.id == id).cloned();
+    let find_ticket = tickets.read().iter().find(|ticket| ticket.id == id).cloned();
 
     rsx! {
         main {
@@ -20,7 +20,7 @@ pub fn TicketDetails(id: u32) -> Element {
                 h1 { "Ticket Details" }
             }
 
-            if let Some(ticket) = maybe_ticket {
+            if let Some(ticket) = find_ticket {
                 section {
                     class: "form-card",
 

@@ -88,6 +88,9 @@ pub fn Home() -> Element {
                             to: Route::TicketDetails { id: ticket.id },
                             article {
                                 class: "ticket-card",
+                                div {
+                                    class: "ticket-status-strip {status_strip_class(ticket.status)}"
+                                }
                                 h3 { "{ticket.title}" }
                                 p { "{ticket.description}" }
                                 div {
@@ -136,6 +139,14 @@ fn parse_status(value: &str) -> TicketStatus {
         "In Progress" => TicketStatus::InProgress,
         "Done" => TicketStatus::Done,
         _ => TicketStatus::Todo,
+    }
+}
+
+fn status_strip_class(status: TicketStatus) -> &'static str {
+    match status {
+        TicketStatus::Todo => "status-todo",
+        TicketStatus::InProgress => "status-in-progress",
+        TicketStatus::Done => "status-done",
     }
 }
 
