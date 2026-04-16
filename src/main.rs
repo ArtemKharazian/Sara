@@ -115,6 +115,8 @@ fn App() -> Element {
                     border: 1px solid #e3e3e8;
                     border-radius: 8px;
                     padding: 12px;
+                    position: relative;
+                    padding-bottom: 44px;
                 }
 
                 .ticket-status-strip {
@@ -156,6 +158,12 @@ fn App() -> Element {
                     color: #555;
                     display: flex;
                     gap: 14px;
+                }
+
+                .delete-button {
+                    position: absolute;
+                    right: 12px;
+                    bottom: 12px;
                 }
 
                 .form-card {

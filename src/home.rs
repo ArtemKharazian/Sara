@@ -116,7 +116,7 @@ pub fn Home() -> Element {
                                     }
                                     span { "Priority: {format_priority(&ticket.priority)}" }
                                     button {
-                                        class: "button",
+                                        class: "button delete-button",
                                         onclick: {
                                             let ticket_id = ticket.id;
                                             move |event| {
