@@ -17,6 +17,7 @@ enum StatusFilter {
 pub fn Home() -> Element {
     let mut tickets = use_context::<Signal<Vec<Ticket>>>();
     let mut selected_filter = use_signal(|| StatusFilter::All);
+    let nav = navigator();
 
     let filtered_tickets: Vec<Ticket> = tickets
         .read()
@@ -82,51 +83,56 @@ pub fn Home() -> Element {
                     class: "ticket-list",
 
                     for ticket in filtered_tickets {
-                        Link {
+                        article {
                             key: "{ticket.id}",
-                            class: "ticket-link",
-                            to: Route::TicketDetails { id: ticket.id },
-                            article {
-                                class: "ticket-card",
-                                div {
-                                    class: "ticket-status-strip {status_strip_class(ticket.status)}"
+                            class: "ticket-card",
+                            onclick: {
+                                let ticket_id = ticket.id;
+                                move |_| {
+                                    nav.push(Route::TicketDetails { id: ticket_id });
                                 }
-                                h3 { "{ticket.title}" }
-                                p { "{ticket.description}" }
-                                div {
-                                    class: "meta",
-                                    span {
-                                        "Status: "
-                                        select {
-                                            value: "{format_status(&ticket.status)}",
-                                            onclick: move |event| event.stop_propagation(),
-                                            onchange: {
-                                                let ticket_id = ticket.id;
-                                                move |event| {
-                                                    let next_status = parse_status(&event.value());
-                                                    if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == ticket_id) {
-                                                        current_ticket.status = next_status;
-                                                    }
-                                                }
-                                            },
-                                            option { value: "Todo", "Todo" }
-                                            option { value: "In Progress", "In Progress" }
-                                            option { value: "Done", "Done" }
-                                        }
-                                    }
-                                    span { "Priority: {format_priority(&ticket.priority)}" }
-                                    button {
-                                        class: "button delete-button",
-                                        onclick: {
+                            },
+                            div {
+                                class: "ticket-status-strip {status_strip_class(ticket.status)}"
+                            }
+                            h3 { "{ticket.title}" }
+                            p { "{ticket.description}" }
+                            div {
+                                class: "meta",
+                                span {
+                                    "Status: "
+                                    select {
+                                        value: "{format_status(&ticket.status)}",
+                                        onmousedown: move |event| event.stop_propagation(),
+                                        onmouseup: move |event| event.stop_propagation(),
+                                        onclick: move |event| event.stop_propagation(),
+                                        onchange: {
                                             let ticket_id = ticket.id;
                                             move |event| {
                                                 event.stop_propagation();
-                                                event.prevent_default();
-                                                tickets.write().retain(|item| item.id != ticket_id);
+                                                let next_status = parse_status(&event.value());
+                                                if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == ticket_id) {
+                                                    current_ticket.status = next_status;
+                                                }
                                             }
                                         },
-                                        "Delete"
+                                        option { value: "Todo", "Todo" }
+                                        option { value: "In Progress", "In Progress" }
+                                        option { value: "Done", "Done" }
                                     }
+                                }
+                                span { "Priority: {format_priority(&ticket.priority)}" }
+                                button {
+                                    class: "button delete-button",
+                                    onclick: {
+                                        let ticket_id = ticket.id;
+                                        move |event| {
+                                            event.stop_propagation();
+                                            event.prevent_default();
+                                            tickets.write().retain(|item| item.id != ticket_id);
+                                        }
+                                    },
+                                    "Delete"
                                 }
                             }
                         }
