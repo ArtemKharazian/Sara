@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
+    db::update_ticket,
     models::{Ticket, TicketPriority, TicketStatus},
     Route,
 };
@@ -35,6 +36,12 @@ pub fn TicketDetails(id: u32) -> Element {
                             oninput: move |event| {
                                 if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == id) {
                                     current_ticket.title = event.value();
+                                    let updated_ticket = current_ticket.clone();
+                                    spawn(async move {
+                                        if let Err(error) = update_ticket(updated_ticket).await {
+                                            eprintln!("Failed to update ticket title: {error}");
+                                        }
+                                    });
                                 }
                             },
                         }
@@ -49,6 +56,12 @@ pub fn TicketDetails(id: u32) -> Element {
                             oninput: move |event| {
                                 if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == id) {
                                     current_ticket.description = event.value();
+                                    let updated_ticket = current_ticket.clone();
+                                    spawn(async move {
+                                        if let Err(error) = update_ticket(updated_ticket).await {
+                                            eprintln!("Failed to update ticket description: {error}");
+                                        }
+                                    });
                                 }
                             },
                         }
@@ -63,6 +76,12 @@ pub fn TicketDetails(id: u32) -> Element {
                             onchange: move |event| {
                                 if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == id) {
                                     current_ticket.status = parse_status(&event.value());
+                                    let updated_ticket = current_ticket.clone();
+                                    spawn(async move {
+                                        if let Err(error) = update_ticket(updated_ticket).await {
+                                            eprintln!("Failed to update ticket status: {error}");
+                                        }
+                                    });
                                 }
                             },
                             option { value: "Todo", "Todo" }
@@ -80,6 +99,12 @@ pub fn TicketDetails(id: u32) -> Element {
                             onchange: move |event| {
                                 if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == id) {
                                     current_ticket.priority = parse_priority(&event.value());
+                                    let updated_ticket = current_ticket.clone();
+                                    spawn(async move {
+                                        if let Err(error) = update_ticket(updated_ticket).await {
+                                            eprintln!("Failed to update ticket priority: {error}");
+                                        }
+                                    });
                                 }
                             },
                             option { value: "Low", "Low" }
