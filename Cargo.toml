@@ -4,4 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dioxus = { version = "0.7", features = ["web", "router"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+dioxus = { version = "=0.7.3", features = ["router", "web", "fullstack"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+dioxus = { version = "=0.7.3", features = ["router", "fullstack", "server"] }
+rusqlite = { version = "0.39.0", features = ["bundled"] }
+
+[features]
+default = ["web"]
+web = []
+server = []

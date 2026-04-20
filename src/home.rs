@@ -103,8 +103,6 @@ pub fn Home() -> Element {
                                     "Status: "
                                     select {
                                         value: "{format_status(&ticket.status)}",
-                                        onmousedown: move |event| event.stop_propagation(),
-                                        onmouseup: move |event| event.stop_propagation(),
                                         onclick: move |event| event.stop_propagation(),
                                         onchange: {
                                             let ticket_id = ticket.id;

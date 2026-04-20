@@ -1,6 +1,8 @@
 use dioxus::prelude::*;
 
 mod create_ticket;
+#[cfg(all(feature = "server", not(target_arch = "wasm32")))]
+mod db;
 mod home;
 mod models;
 mod ticket_details;
@@ -11,6 +13,9 @@ use models::mock_tickets;
 use ticket_details::TicketDetails;
 
 fn main() {
+    #[cfg(all(feature = "server", not(target_arch = "wasm32")))]
+    db::init_db().expect("failed to initialize SQLite database");
+
     dioxus::launch(App);
 }
 
