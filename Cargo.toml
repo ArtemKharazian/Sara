@@ -4,15 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
-dioxus = { version = "=0.7.3", features = ["router", "web", "fullstack"] }
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-dioxus = { version = "=0.7.3", features = ["router", "fullstack", "server"] }
-rusqlite = { version = "0.39.0", features = ["bundled"] }
+dioxus = { version = "=0.7.3", features = ["router", "fullstack"] }
+serde = { version = "1", features = ["derive"] }
+rusqlite = { version = "0.39.0", features = ["bundled"], optional = true }
 
 [features]
-default = ["web"]
-web = []
-server = []
+default = []
+web = ["dioxus/web"]
+server = ["dioxus/server", "dep:rusqlite"]

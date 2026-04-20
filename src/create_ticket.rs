@@ -1,7 +1,8 @@
 use dioxus::prelude::*;
 
 use crate::{
-    models::{Ticket, TicketPriority, TicketStatus},
+    db::{create_ticket, list_tickets},
+    models::{Ticket, TicketPriority},
     Route,
 };
 
@@ -10,7 +11,8 @@ pub fn CreateTicket() -> Element {
     let mut title = use_signal(String::new);
     let mut description = use_signal(String::new);
     let mut priority = use_signal(|| TicketPriority::Medium);
-    let mut tickets = use_context::<Signal<Vec<Ticket>>>();
+    let mut save_error = use_signal(|| None::<String>);
+    let tickets = use_context::<Signal<Vec<Ticket>>>();
     let nav = navigator();
 
     rsx! {
@@ -64,27 +66,37 @@ pub fn CreateTicket() -> Element {
                     button {
                         class: "button",
                         onclick: move |_| {
-                            if title.read().trim().is_empty() {
+                            let title_value = title.read().trim().to_string();
+                            if title_value.is_empty() {
+                                save_error.set(Some("Title is required.".to_string()));
                                 return;
                             }
 
-                            let next_id = tickets
-                                .read()
-                                .iter()
-                                .map(|ticket| ticket.id)
-                                .max()
-                                .unwrap_or(0)
-                                + 1;
+                            save_error.set(None);
 
-                            tickets.write().push(Ticket {
-                                id: next_id,
-                                title: title.read().trim().to_string(),
-                                description: description.read().trim().to_string(),
-                                status: TicketStatus::Todo,
-                                priority: *priority.read(),
+                            let description_value = description.read().trim().to_string();
+                            let priority_value = *priority.read();
+                            let nav = nav.clone();
+                            let mut tickets = tickets;
+                            let mut save_error = save_error;
+
+                            spawn(async move {
+                                match create_ticket(title_value, description_value, priority_value)
+                                    .await
+                                {
+                                    Ok(()) => {
+                                        if let Ok(db_tickets) = list_tickets().await {
+                                            tickets.set(db_tickets);
+                                        }
+                                        nav.push(Route::Home {});
+                                    }
+                                    Err(error) => {
+                                        save_error.set(Some(format!(
+                                            "Save failed: {error}"
+                                        )));
+                                    }
+                                }
                             });
-
-                            nav.push(Route::Home {});
                         },
                         "Save"
                     }
@@ -93,6 +105,13 @@ pub fn CreateTicket() -> Element {
                         class: "link-button",
                         to: Route::Home {},
                         "Cancel"
+                    }
+                }
+
+                if let Some(message) = save_error.read().clone() {
+                    p {
+                        style: "margin-top: 10px; color: #b00020;",
+                        "{message}"
                     }
                 }
             }

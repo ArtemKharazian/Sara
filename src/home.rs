@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 
 use crate::{
+    db::{list_tickets, update_ticket_status},
     models::{Ticket, TicketPriority, TicketStatus},
     Route,
 };
@@ -17,7 +18,22 @@ enum StatusFilter {
 pub fn Home() -> Element {
     let mut tickets = use_context::<Signal<Vec<Ticket>>>();
     let mut selected_filter = use_signal(|| StatusFilter::All);
+    let mut loaded_from_db = use_signal(|| false);
     let nav = navigator();
+
+    use_effect(move || {
+        if *loaded_from_db.read() {
+            return;
+        }
+
+        loaded_from_db.set(true);
+
+        spawn(async move {
+            if let Ok(db_tickets) = list_tickets().await {
+                tickets.set(db_tickets);
+            }
+        });
+    });
 
     let filtered_tickets: Vec<Ticket> = tickets
         .read()
@@ -82,55 +98,62 @@ pub fn Home() -> Element {
                 div {
                     class: "ticket-list",
 
-                    for ticket in filtered_tickets {
-                        article {
-                            key: "{ticket.id}",
-                            class: "ticket-card",
-                            onclick: {
-                                let ticket_id = ticket.id;
-                                move |_| {
-                                    nav.push(Route::TicketDetails { id: ticket_id });
+                    if filtered_tickets.is_empty() {
+                        p { "No tickets yet." }
+                    } else {
+                        for ticket in filtered_tickets {
+                            article {
+                                key: "{ticket.id}",
+                                class: "ticket-card",
+                                onclick: {
+                                    let ticket_id = ticket.id;
+                                    move |_| {
+                                        nav.push(Route::TicketDetails { id: ticket_id });
+                                    }
+                                },
+                                div {
+                                    class: "ticket-status-strip {status_strip_class(ticket.status)}"
                                 }
-                            },
-                            div {
-                                class: "ticket-status-strip {status_strip_class(ticket.status)}"
-                            }
-                            h3 { "{ticket.title}" }
-                            p { "{ticket.description}" }
-                            div {
-                                class: "meta",
-                                span {
-                                    "Status: "
-                                    select {
-                                        value: "{format_status(&ticket.status)}",
-                                        onclick: move |event| event.stop_propagation(),
-                                        onchange: {
+                                h3 { "{ticket.title}" }
+                                p { "{ticket.description}" }
+                                div {
+                                    class: "meta",
+                                    span {
+                                        "Status: "
+                                        select {
+                                            value: "{format_status(&ticket.status)}",
+                                            onclick: move |event| event.stop_propagation(),
+                                            onchange: {
+                                                let ticket_id = ticket.id;
+                                                move |event| {
+                                                    event.stop_propagation();
+                                                    let next_status = parse_status(&event.value());
+                                                    if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == ticket_id) {
+                                                        current_ticket.status = next_status;
+                                                    }
+                                                    spawn(async move {
+                                                        let _ = update_ticket_status(ticket_id, next_status).await;
+                                                    });
+                                                }
+                                            },
+                                            option { value: "Todo", "Todo" }
+                                            option { value: "In Progress", "In Progress" }
+                                            option { value: "Done", "Done" }
+                                        }
+                                    }
+                                    span { "Priority: {format_priority(&ticket.priority)}" }
+                                    button {
+                                        class: "button delete-button",
+                                        onclick: {
                                             let ticket_id = ticket.id;
                                             move |event| {
                                                 event.stop_propagation();
-                                                let next_status = parse_status(&event.value());
-                                                if let Some(current_ticket) = tickets.write().iter_mut().find(|item| item.id == ticket_id) {
-                                                    current_ticket.status = next_status;
-                                                }
+                                                event.prevent_default();
+                                                tickets.write().retain(|item| item.id != ticket_id);
                                             }
                                         },
-                                        option { value: "Todo", "Todo" }
-                                        option { value: "In Progress", "In Progress" }
-                                        option { value: "Done", "Done" }
+                                        "Delete"
                                     }
-                                }
-                                span { "Priority: {format_priority(&ticket.priority)}" }
-                                button {
-                                    class: "button delete-button",
-                                    onclick: {
-                                        let ticket_id = ticket.id;
-                                        move |event| {
-                                            event.stop_propagation();
-                                            event.prevent_default();
-                                            tickets.write().retain(|item| item.id != ticket_id);
-                                        }
-                                    },
-                                    "Delete"
                                 }
                             }
                         }

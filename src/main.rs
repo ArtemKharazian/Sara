@@ -1,7 +1,6 @@
 use dioxus::prelude::*;
 
 mod create_ticket;
-#[cfg(all(feature = "server", not(target_arch = "wasm32")))]
 mod db;
 mod home;
 mod models;
@@ -9,7 +8,7 @@ mod ticket_details;
 
 use create_ticket::CreateTicket;
 use home::Home;
-use models::mock_tickets;
+use models::Ticket;
 use ticket_details::TicketDetails;
 
 fn main() {
@@ -31,7 +30,7 @@ enum Route {
 
 #[component]
 fn App() -> Element {
-    let tickets = use_signal(mock_tickets);
+    let tickets = use_signal(|| Vec::<Ticket>::new());
     use_context_provider(|| tickets);
 
     rsx! {
